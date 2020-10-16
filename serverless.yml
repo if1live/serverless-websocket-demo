@@ -1,0 +1,41 @@
+service:
+  name: websocket-ws
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+provider:
+  name: aws
+  stage: ${env:NODE_ENV, "development"}
+  region: ap-northeast-2
+  runtime: nodejs12.x
+
+functions:
+  connect:
+    handler: handler.connect
+    events:
+      - websocket:
+          route: $connect
+  disconnect:
+    handler: handler.disconnect
+    events:
+      - websocket:
+          route: $disconnect
+  broadcast:
+    handler: handler.handle
+    events:
+      - websocket:
+          route: $default
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules:
+      forceExclude:
+        - aws-sdk
+  serverless-offline:
+    port: 3000
+    httpPort: 3000
+    websocketPort: 3001
+    host: 0.0.0.0
